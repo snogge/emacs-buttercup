@@ -737,12 +737,11 @@ Return CHILD."
 
 (defun buttercup--specs (spec-or-suite-list)
   "Return a flat list of all specs in SPEC-OR-SUITE-LIST."
-  (let (specs)
-    (dolist (spec-or-suite spec-or-suite-list specs)
-      (if (buttercup-spec-p spec-or-suite)
-          (setq specs (append specs (list spec-or-suite)))
-        (setq specs (append specs (buttercup--specs
-                                   (buttercup-suite-children spec-or-suite))))))))
+  (cl-loop for spec-or-suite in spec-or-suite-list
+           if (buttercup-spec-p spec-or-suite)
+           collect spec-or-suite
+           else
+           nconc (buttercup--specs (buttercup-suite-children spec-or-suite))))
 
 (defun buttercup--specs-and-suites (spec-or-suite-list)
   "Return a flat list of all specs and suites in SPEC-OR-SUITE-LIST."
