@@ -719,9 +719,13 @@ Return CHILD."
 (define-obsolete-function-alias 'buttercup-suite-parents 'buttercup-suite-or-spec-parents "emacs-buttercup 1.10")
 (define-obsolete-function-alias 'buttercup-spec-parents 'buttercup-suite-or-spec-parents "emacs-buttercup 1.10")
 
-(defun buttercup-suites-total-specs-defined (suite-list)
-  "Return the number of specs defined in all suites in SUITE-LIST."
-  (length (buttercup--specs suite-list)))
+(defun buttercup-suites-total-specs-defined (suite-or-spec-list)
+  "Return the number of specs defined in SUITE-OR-SPEC-LIST."
+  (cl-loop for sos in suite-or-spec-list
+           sum (if (buttercup-spec-p sos)
+                   1
+                 (buttercup-suites-total-specs-defined
+                  (buttercup-suite-children sos)))))
 
 (defun buttercup-suites-total-specs-status (suite-list status)
   "Return the number of specs in SUITE-LIST marked with STATUS."
