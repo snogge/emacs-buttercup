@@ -729,7 +729,11 @@ Return CHILD."
 
 (defun buttercup-suites-total-specs-status (suite-list status)
   "Return the number of specs in SUITE-LIST marked with STATUS."
-  (cl-count status (buttercup--specs suite-list) :key #'buttercup-spec-status))
+  (cl-loop for sos in suite-list
+           sum (if (buttercup-spec-p sos)
+                   (if (eq status (buttercup-spec-status sos)) 1 0)
+                 (buttercup-suites-total-specs-status
+                  (buttercup-suite-children sos) status))))
 
 (defun buttercup-suites-total-specs-pending (suite-list)
   "Return the number of specs marked as pending in all suites in SUITE-LIST."
