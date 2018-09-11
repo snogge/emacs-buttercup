@@ -712,9 +712,8 @@ Return CHILD."
 
 (defun buttercup-suite-or-spec-parents (suite-or-spec)
   "Return a list of parents of SUITE-OR-SPEC."
-  (when (buttercup-suite-or-spec-parent suite-or-spec)
-    (cons (buttercup-suite-or-spec-parent suite-or-spec)
-          (buttercup-suite-or-spec-parents (buttercup-suite-or-spec-parent suite-or-spec)))))
+  (cl-loop for parent = (buttercup-suite-or-spec-parent (or parent suite-or-spec))
+           while parent collect parent))
 
 (define-obsolete-function-alias 'buttercup-suite-parents 'buttercup-suite-or-spec-parents "emacs-buttercup 1.10")
 (define-obsolete-function-alias 'buttercup-spec-parents 'buttercup-suite-or-spec-parents "emacs-buttercup 1.10")
