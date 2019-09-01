@@ -749,5 +749,9 @@ suppresses Buttercup's warning capturing within the body.
         (display-warning 'buttercup warning-text)
         (expect (with-current-buffer "*Warnings*"
                   (buffer-string))
-                :to-match (regexp-quote warning-text))))))
+                :to-match (regexp-quote warning-text)))))
+  (it "but keep normal behaviour "
+    (let (buttercup-warning-buffer-name)
+      (display-warning 'buttercup "This warning should break the test report.")
+      (expect (+ 2 2) :to-equal 4))))
 ```
