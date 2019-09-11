@@ -491,7 +491,12 @@ text properties using `ansi-color-apply'."
     (expect (macroexpand '(describe "description" :var* (foo bar) (+ foo bar)))
             :to-equal
             '(buttercup-describe "description"
-                                 (lambda () (let* (foo bar) (+ foo bar)))))))
+                                 (lambda () (let* (foo bar) (+ foo bar))))))
+  (it "should support both :var and :var* in the same suite"
+    (expect (macroexpand '(describe "description" :var (foo) :var* (bar) (+ foo bar)))
+            :to-equal
+            '(buttercup-describe "description"
+                                 (lambda () (let (foo) (let* (bar) (+ foo bar))))))))
 
 (describe "The `buttercup-describe' function"
   (it "should run the enclosing body"

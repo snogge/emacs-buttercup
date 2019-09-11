@@ -819,16 +819,17 @@ form.")
 DESCRIPTION is a string. BODY is a sequence of instructions,
 mainly calls to `describe', `it' and `before-each'."
   (declare (indent 1) (debug (&define sexp def-body)))
-  (let ((new-body
-         (cond
-          ((eq (elt body 0) :var)
-           `((let ,(elt body 1)
-               ,@(cddr body))))
-          ((eq (elt body 0) :var*)
-           `((let* ,(elt body 1)
-               ,@(cddr body))))
-          (t body))))
-    `(buttercup-describe ,description (lambda () ,@new-body))))
+  (let (surrounds)
+    (while (keywordp (car body))
+      (unless (cdr body)
+        (error "%s has no argument" (car body)))
+      (cl-ecase (car body)
+        (:var (push `(let ,(cadr body)) surrounds))
+        (:var* (push `(let* ,(cadr body)) surrounds)))
+      (setq body (cddr body)))
+    (dolist (s surrounds)
+      (setq body `((,@s ,@body)))))
+  `(buttercup-describe ,description (lambda () ,@body)))
 
 (defun buttercup-describe (description body-function)
   "Function to handle a `describe' form.
