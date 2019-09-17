@@ -684,7 +684,9 @@ See also `buttercup-define-matcher'."
   after-each
   ;; Likewise, but before and after all specs.
   before-all
-  after-all)
+  after-all
+  ;;
+  (wrapper (lambda (f) (funcall f))))
 
 (cl-defstruct (buttercup-spec (:include buttercup-suite-or-spec))
   ;; The closure to run for this spec
@@ -819,19 +821,26 @@ form.")
 DESCRIPTION is a string. BODY is a sequence of instructions,
 mainly calls to `describe', `it' and `before-each'."
   (declare (indent 1) (debug (&define sexp def-body)))
-  (let (surrounds)
+  (let (surrounds wrappers)
     (while (keywordp (car body))
       (unless (cdr body)
         (error "%s has no argument" (car body)))
       (cl-ecase (car body)
+        (:letf (push `(cl-letf ,(cadr body)) wrappers))
         (:var (push `(let ,(cadr body)) surrounds))
         (:var* (push `(let* ,(cadr body)) surrounds)))
       (setq body (cddr body)))
     (dolist (s surrounds)
-      (setq body `((,@s ,@body)))))
-  `(buttercup-describe ,description (lambda () ,@body)))
+      (setq body `((,@s ,@body))))
+    (when wrappers
+      (cl-loop for w in wrappers
+               with wrapper = '((funcall f))
+               do (setq wrapper `((,@w ,@wrapper)))
+               finally do (setq wrappers `(lambda (f) ,@wrapper))))
+    `(buttercup-describe ,description (lambda () ,@body)
+                         :wrapper ,wrappers)))
 
-(defun buttercup-describe (description body-function)
+(cl-defun buttercup-describe (description body-function &key wrapper)
   "Function to handle a `describe' form.
 
 DESCRIPTION has the same meaning as in `describe'. BODY-FUNCTION
@@ -840,6 +849,8 @@ is a function containing the body instructions passed to
   (let* ((enclosing-suite buttercup--current-suite)
          (buttercup--current-suite (make-buttercup-suite
                                     :description description)))
+    (when wrapper
+      (setf (buttercup-suite-wrapper buttercup--current-suite) wrapper))
     (condition-case nil
         (funcall body-function)
       (buttercup-pending
@@ -1465,23 +1476,25 @@ Do not change the global value.")
 (defun buttercup--run-suite (suite)
   "Run SUITE. A suite is a sequence of suites and specs."
   (buttercup--set-start-time suite)
-  (let* ((buttercup--before-each (append buttercup--before-each
-                                         (buttercup-suite-before-each suite)))
-         (buttercup--after-each (append (buttercup-suite-after-each suite)
-                                        buttercup--after-each)))
-    (funcall buttercup-reporter 'suite-started suite)
-    (dolist (f (buttercup-suite-before-all suite))
-      (buttercup--update-with-funcall suite f))
-    (dolist (sub (buttercup-suite-children suite))
-      (cond
-       ((buttercup-suite-p sub)
-        (buttercup--run-suite sub))
-       ((buttercup-spec-p sub)
-        (buttercup--run-spec sub))))
-    (dolist (f (buttercup-suite-after-all suite))
-      (buttercup--update-with-funcall suite f))
-    (buttercup--set-end-time suite)
-    (funcall buttercup-reporter 'suite-done suite)))
+  (funcall (buttercup-suite-wrapper suite)
+           (lambda ()
+             (let* ((buttercup--before-each (append buttercup--before-each
+                                                    (buttercup-suite-before-each suite)))
+                    (buttercup--after-each (append (buttercup-suite-after-each suite)
+                                                   buttercup--after-each)))
+               (funcall buttercup-reporter 'suite-started suite)
+               (dolist (f (buttercup-suite-before-all suite))
+                 (buttercup--update-with-funcall suite f))
+               (dolist (sub (buttercup-suite-children suite))
+                 (cond
+                  ((buttercup-suite-p sub)
+                   (buttercup--run-suite sub))
+                  ((buttercup-spec-p sub)
+                   (buttercup--run-spec sub))))
+               (dolist (f (buttercup-suite-after-all suite))
+                 (buttercup--update-with-funcall suite f)))))
+  (buttercup--set-end-time suite)
+  (funcall buttercup-reporter 'suite-done suite))
 
 (defun buttercup--run-spec (spec)
   (buttercup--set-start-time spec)

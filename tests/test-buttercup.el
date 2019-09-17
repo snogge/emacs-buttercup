@@ -480,23 +480,26 @@ text properties using `ansi-color-apply'."
   (it "should expand to a simple call to the buttercup-describe function"
     (expect (macroexpand '(describe "description" (+ 1 1)))
             :to-equal
-            '(buttercup-describe "description" (lambda () (+ 1 1)))))
+            '(buttercup-describe "description" (lambda () (+ 1 1)) :wrapper nil)))
 
   (it "should support the :var argument"
     (expect (macroexpand '(describe "description" :var (foo bar) (+ foo bar)))
             :to-equal
             '(buttercup-describe "description"
-                                 (lambda () (let (foo bar) (+ foo bar))))))
+                                 (lambda () (let (foo bar) (+ foo bar)))
+                                 :wrapper nil)))
   (it "should support the :var* argument"
     (expect (macroexpand '(describe "description" :var* (foo bar) (+ foo bar)))
             :to-equal
             '(buttercup-describe "description"
-                                 (lambda () (let* (foo bar) (+ foo bar))))))
+                                 (lambda () (let* (foo bar) (+ foo bar)))
+                                 :wrapper nil)))
   (it "should support both :var and :var* in the same suite"
     (expect (macroexpand '(describe "description" :var (foo) :var* (bar) (+ foo bar)))
             :to-equal
             '(buttercup-describe "description"
-                                 (lambda () (let (foo) (let* (bar) (+ foo bar))))))))
+                                 (lambda () (let (foo) (let* (bar) (+ foo bar))))
+                                 :wrapper nil))))
 
 (describe "The `buttercup-describe' function"
   (it "should run the enclosing body"
@@ -645,7 +648,8 @@ text properties using `ansi-color-apply'."
             :to-equal
             '(buttercup-describe "bla bla"
                                  (lambda ()
-                                   (signal 'buttercup-pending "PENDING")))))
+                                   (signal 'buttercup-pending "PENDING"))
+                                 :wrapper nil)))
 
   (it "changes contained it-specs to pending specs"
     (expect (macroexpand-all
@@ -665,9 +669,11 @@ text properties using `ansi-color-apply'."
                    "inner suite"
                    #'(lambda ()
                        (buttercup-xit "inner spec")
-                       (signal 'buttercup-pending "PENDING")))
+                       (signal 'buttercup-pending "PENDING"))
+                   :wrapper nil)
                   (buttercup-xit "spec2")
-                  (signal 'buttercup-pending "PENDING")))))
+                  (signal 'buttercup-pending "PENDING"))
+              :wrapper nil)))
 
   (it "should add a pending suite"
     (let ((buttercup--current-suite nil)

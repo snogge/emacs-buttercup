@@ -230,11 +230,32 @@ Using `:var` and `:var*` works just like the `let` equivalents, but
 it's recommended to use the `:var` format to be future proof. Future
 internal changes in `buttercup` could break suites using `let`.
 
+### Using Local :letf
+
+The `describe` macro also supports the `:letf' arg. It can be used to
+bind any generalized variable using `cl-letf*' while running the
+suite.  This is different from `:var` and `:var*' in that it is used
+while running the test rather than while defining them, and it can be
+used for functions.
+
+```Emacs-Lisp
+(describe "A Spec using :letf"
+  :letf ((foo 1)
+         ((symbol-function 'bar) (lambda (x) (* 2 x))))
+  (it "has access to bound functions"
+    (expect (bar 2) :to-be 4))
+  (it "has access to bound variables"
+    (expect foo :to-be 1))
+    )
+```
+
 ### Setup and Teardown
 
-To help a test suite DRY up any duplicated setup and teardown code,
-Buttercup provides the `before-each`, `after-each`, `before-all` and
-`after-all` special forms.
+To help a test suite
+[DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) up any
+duplicated setup and teardown code, Buttercup provides the
+`before-each`, `after-each`, `before-all` and `after-all` special
+forms.
 
 As the name implies, code blocks defined with `before-each` are called
 once before each spec in the `describe` is run, and the `after-each`
