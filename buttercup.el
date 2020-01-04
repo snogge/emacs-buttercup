@@ -593,8 +593,7 @@ See also `buttercup-define-matcher'."
     (let*
         ((matched
           (and thrown-signal
-               (or (null expected-signal-symbol)
-                   (memq expected-signal-symbol (get thrown-signal-symbol 'error-conditions)))
+               (memq expected-signal-symbol (get thrown-signal-symbol 'error-conditions))
                (or (null expected-signal-args)
                    (equal thrown-signal-args expected-signal-args))))
          (spec (format-spec-make
