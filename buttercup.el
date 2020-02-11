@@ -708,6 +708,15 @@ Return CHILD."
 (define-obsolete-function-alias 'buttercup-suite-parents 'buttercup-suite-or-spec-parents "emacs-buttercup 1.10")
 (define-obsolete-function-alias 'buttercup-spec-parents 'buttercup-suite-or-spec-parents "emacs-buttercup 1.10")
 
+(defun buttercup--pending-p (suite-or-spec)
+  "Return non-nil if SUITE-OR-SPEC is pending.
+A spec is pending if it's `status' is `pending', a suite if all
+of its contained specs have `status' pending."
+  (if (buttercup-spec-p suite-or-spec)
+      (eq (buttercup-suite-or-spec-status suite-or-spec) 'pending)
+    (cl-every (lambda (spec) (eq (buttercup-suite-or-spec-status spec) 'pending))
+              (buttercup--specs (buttercup-suite-children suite-or-spec)))))
+
 (defun buttercup-suites-total-specs-defined (suite-list)
   "Return the number of specs defined in all suites in SUITE-LIST."
   (length (buttercup--specs suite-list)))
