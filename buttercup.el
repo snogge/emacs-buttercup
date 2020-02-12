@@ -1038,7 +1038,7 @@ ignored. Return the created spec object."
     (setf (buttercup-spec-status spec)
           'pending
           (buttercup-spec-failure-description spec)
-          "")
+          "PENDING")
     spec))
 
 ;;;;;;;;;
