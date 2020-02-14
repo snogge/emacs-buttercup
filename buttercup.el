@@ -1501,12 +1501,13 @@ Do not change the global value.")
         (get-buffer-create buttercup-warning-buffer-name)
 
         (funcall buttercup-reporter 'spec-started spec)
-        (buttercup-with-cleanup
-         (dolist (f buttercup--before-each)
-           (buttercup--update-with-funcall spec f))
-         (buttercup--update-with-funcall spec (buttercup-spec-function spec))
-         (dolist (f buttercup--after-each)
-           (buttercup--update-with-funcall spec f)))
+        (unless (buttercup--pending-p spec)
+          (buttercup-with-cleanup
+           (dolist (f buttercup--before-each)
+             (buttercup--update-with-funcall spec f))
+           (buttercup--update-with-funcall spec (buttercup-spec-function spec))
+           (dolist (f buttercup--after-each)
+             (buttercup--update-with-funcall spec f))))
         (funcall buttercup-reporter 'spec-done spec)
         ;; Display warnings that were issued while running the the
         ;; spec, if any
