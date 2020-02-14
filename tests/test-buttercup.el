@@ -471,7 +471,39 @@ text properties using `ansi-color-apply'."
           (after-each (assume nil "assume nil in after-each")))
         (buttercup-run)
         (expect (buttercup-suites-total-specs-pending buttercup-suites)
-                :to-equal 1)))))
+                :to-equal 1))))
+
+  (describe "should not run `before-each', spec, or `after-each'"
+    (before-each (spy-on 'do-not-call))
+    (it "for specs set as pending beforehand"
+      (with-local-buttercup
+        (describe "suite"
+          (before-each (do-not-call 'before))
+          (xit "spec" (do-not-call 'spec) (expect 1 :to-equal 2))
+          (after-each (do-not-call 'after)))
+        (buttercup-run)
+        (expect (buttercup-suites-total-specs-pending buttercup-suites)
+                :to-equal 1))
+      (expect 'do-not-call :not :to-have-been-called-with 'before)
+      (expect 'do-not-call :not :to-have-been-called-with 'spec)
+      (expect 'do-not-call :not :to-have-been-called-with 'after)
+      (expect 'do-not-call :not :to-have-been-called))
+    (it "but do for specs marked pending by `assume'"
+      (with-local-buttercup
+        (describe "suite"
+          (before-each (do-not-call 'before))
+          (it "spec"
+            (assume nil "Do not call `do-not-call'")
+            (do-not-call 'spec)
+            (expect 1 :to-equal 2))
+          (after-each (do-not-call 'after)))
+        (buttercup-run)
+        (expect (buttercup-suites-total-specs-pending buttercup-suites)
+                :to-equal 1))
+      (expect 'do-not-call :to-have-been-called-with 'before)
+      (expect 'do-not-call :not :to-have-been-called-with 'spec)
+      (expect 'do-not-call :to-have-been-called-with 'after)
+      (expect 'do-not-call :to-have-been-called-times 2))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; Suites: describe
