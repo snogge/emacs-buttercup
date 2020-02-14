@@ -639,6 +639,33 @@ text properties using `ansi-color-apply'."
               :to-equal
               (list 23)))))
 
+(describe "When tests abort"
+  (it "the before and after functions should still run"
+    (let (all-before all-after each-before each-after)
+      (expect
+       (with-local-buttercup
+         (setq buttercup-stop-on-first-failure t)
+         (describe "suite"
+           (before-all
+             (setq all-before t))
+           (after-all
+             (setq all-after t))
+           (before-each
+             (setq each-before t)
+             (spy-on 'not-a-real-function))
+           (after-each
+             (setq each-after t))
+           (it "spec that fails"
+             (not-a-real-function)
+             (expect nil)))
+         (buttercup-run)) :to-throw)
+      (expect (symbol-function 'not-a-real-function) :to-be nil)
+      (expect (list all-before
+                    all-after
+                    each-before
+                    each-after) :to-equal '(t t t t))
+      )))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Disabled Suites: xdescribe
 
@@ -1357,7 +1384,24 @@ text properties using `ansi-color-apply'."
                 (buttercup-reporter 'reporter)
                 (buttercup-suites (make-list 5 parent-suite)))
         (expect (buttercup-run) :not :to-throw)
-        (expect 'runner :to-have-been-called-times 5)))))
+        (expect 'runner :to-have-been-called-times 5))))
+  (it "should call all reporter steps even on abort"
+    (let (reporter-args)
+      (with-local-buttercup
+       (setq buttercup-reporter (lambda (&rest args) (push args reporter-args)))
+       (describe "suite"
+         (it "spec"
+           (signal 'buttercup-abort "buttercup-abort")))
+       (buttercup-run))
+      (expect (nreverse (mapcar #'car reporter-args)) :to-equal
+              '(buttercup-started
+                suite-started
+                spec-started
+                spec-done
+                suite-done
+                buttercup-done))))
+
+  )
 
 (describe "The `buttercup--print' function"
   (before-each
