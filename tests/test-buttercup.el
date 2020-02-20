@@ -488,6 +488,24 @@ text properties using `ansi-color-apply'."
       (expect 'do-not-call :not :to-have-been-called-with 'spec)
       (expect 'do-not-call :not :to-have-been-called-with 'after)
       (expect 'do-not-call :not :to-have-been-called))
+    (it "assumptions makes an ass out of you and mptions"
+      (with-local-buttercup
+        (describe "suite"
+          (before-each (do-not-call 1))
+          (before-each (do-not-call 2))
+          (before-each (assume nil "assume is weird"))
+          (it "spec" (do-not-call 'spec) (assume nil "assume is weird"))
+          (after-each (do-not-call 'after)))
+        (buttercup-run)
+        ;(expect (buttercup-suites-total-specs-pending buttercup-suites)
+         ;       :to-equal 1)
+        )
+      (expect 'do-not-call :to-have-been-called-with 1)
+      (expect 'do-not-call :to-have-been-called-with 2)
+      (expect 'do-not-call :to-have-been-called-with 'spec)
+      (expect 'do-not-call :to-have-been-called-with 'after)
+      (expect 'do-not-call :to-have-been-called-times 4)
+      )
     (it "but do for specs marked pending by `assume'"
       (with-local-buttercup
         (describe "suite"
