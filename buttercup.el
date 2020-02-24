@@ -670,6 +670,7 @@ See also `buttercup-define-matcher'."
   parent
   ;; One of: passed failed pending
   (status 'passed)
+  conditions ; Tests that mark as pending if false
   failure-description
   failure-stack
   time-started
@@ -819,13 +820,14 @@ form.")
 DESCRIPTION is a string. BODY is a sequence of instructions,
 mainly calls to `describe', `it' and `before-each'."
   (declare (indent 1) (debug (&define sexp def-body)))
-  (let (surrounds)
+  (let (surrounds conditions)
     (while (keywordp (car body))
       (unless (cdr body)
         (error "%s has no argument" (car body)))
       (cl-ecase (car body)
         (:var (push `(let ,(cadr body)) surrounds))
-        (:var* (push `(let* ,(cadr body)) surrounds)))
+        (:var* (push `(let* ,(cadr body)) surrounds))
+        (:assume (push (lambda () (cadr body)) conditions)))
       (setq body (cddr body)))
     (dolist (s surrounds)
       (setq body `((,@s ,@body)))))
