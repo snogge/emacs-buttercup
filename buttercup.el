@@ -1341,7 +1341,7 @@ each frame, and prefixes each stack frame with lambda or M to
 indicate whether it represents a normal evaluated function call
 or a macro/special form.")
 
-(defvar buttercup-color t
+(defvar buttercup-color "auto"
   "Whether to use colors in output.")
 
 (defconst buttercup-warning-buffer-name " *Buttercup-Warnings*"
@@ -1391,7 +1391,7 @@ current directory."
         (push (cadr args) patterns)
         (setq args (cddr args)))
        ((member (car args) '("-c" "--no-color"))
-        (setq buttercup-color nil)
+        (setq buttercup-color "never")
         (setq args (cdr args)))
        ((equal (car args) "--no-skip")
         (push 'skipped buttercup-reporter-batch-quiet-statuses)
@@ -1404,6 +1404,12 @@ current directory."
        ((equal (car args) "--stale-file-error")
         (buttercup-error-on-stale-elc)
         (setq args (cdr args)))
+       ((member (car args) '("--color"))
+        (when (not (cdr args))
+          (error "Option requires argument: %s" (car args)))
+        (unless (member (setq buttercup-color (cadr args)) '("always" "auto" "never"))
+          (error "--color argument must be one of `always', `auto', or `never'"))
+        (setq args (cddr args)))
        (t
         (push (car args) dirs)
         (setq args (cdr args)))))
@@ -1413,6 +1419,7 @@ current directory."
                      dir "\\`test-.*\\.el\\'\\|-tests?\\.el\\'"))
         ;; Exclude any hidden directory, both immediate (^.) and nested (/.) subdirs
         (when (not (string-match "\\(^\\|/\\)\\." (file-relative-name file)))
+          (display-warning 'buttercup (concat "Loading " file))
           (load file nil t))))
     (when patterns
       (buttercup-mark-skipped patterns t))

@@ -44,6 +44,11 @@ Buttercup options:
                           Implies "--no-skip".
 
 --no-color, -c          Do not colorize test output.
+                          The last color option wins.
+
+--color WHEN            Colorize the output; WHEN can be 'always'
+                          (default if omitted), 'auto', or 'never'.
+                          The last color option wins.
 
 --traceback STYLE       When printing backtraces for errors that occur
                           during tests, print them in the chosen
@@ -91,6 +96,15 @@ do
             ;;
         "-c"|"--no-color"|"--no-skip"|"--only-error"|"--stale-file-error")
             BUTTERCUP_ARGS+=("$1")
+            shift
+            ;;
+        "--color=*")
+            BUTTERCUP_ARGS+=("--color" "${1#--color=")
+            shift
+        "--color")
+            BUTTERCUP_ARGS+=("$1")
+            BUTTERCUP_ARGS+=("$2")
+            shift
             shift
             ;;
         "--traceback")
