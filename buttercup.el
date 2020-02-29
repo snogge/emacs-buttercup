@@ -1555,14 +1555,19 @@ Do not change the global value.")
     (buttercup--set-end-time suite)
     (funcall buttercup-reporter 'suite-done suite)))
 
+(defsubst buttercup--kill-warning-buffer ()
+  "Kill the buffer named `buttercup-warning-buffer-name', if any."
+  (when (and buttercup-warning-buffer-name
+			 (get-buffer buttercup-warning-buffer-name))
+    (kill-buffer buttercup-warning-buffer-name)))
+
 (defun buttercup--run-spec (spec)
   "Run SPEC."
   (buttercup--set-start-time spec)
   (unwind-protect
       (progn
         ;; Kill any previous warning buffer, just in case
-        (when (get-buffer buttercup-warning-buffer-name)
-          (kill-buffer buttercup-warning-buffer-name))
+		(buttercup--kill-warning-buffer)
         (get-buffer-create buttercup-warning-buffer-name)
 
         (funcall buttercup-reporter 'spec-started spec)
@@ -1591,8 +1596,7 @@ Do not change the global value.")
                                   (if (looking-at-p "\n")
                                       (point) (point-max))))
               'yellow)))))
-    (when (get-buffer buttercup-warning-buffer-name)
-      (kill-buffer buttercup-warning-buffer-name))
+	(buttercup--kill-warning-buffer)
     (buttercup--set-end-time spec)))
 
 (defun buttercup--update-with-funcall (suite-or-spec function &rest args)
