@@ -79,6 +79,9 @@ do
             shift
             shift
             ;;
+        "--pattern=*")
+            BUTTERCUP_ARGS+=("--pattern" "${1#--pattern=")
+            shift
         "-p"|"--pattern")
             BUTTERCUP_ARGS+=("$1")
             BUTTERCUP_ARGS+=("$2")
