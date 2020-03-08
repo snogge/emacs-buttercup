@@ -73,6 +73,11 @@ do
             usage
             exit
             ;;
+        # Emacs accepts these options with --option=val syntax too
+        --directory=*|--funcall=*|--load=*|--eval=*|--execute=*)
+            EMACS_ARGS+=("$1")
+            shift
+            ;;
         "-L"|"--directory"|"-f"|"--funcall"|"-l"|"--load"|"--eval"|"--execute")
             EMACS_ARGS+=("$1" "$2")
             shift 2
