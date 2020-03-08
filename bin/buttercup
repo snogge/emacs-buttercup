@@ -74,29 +74,23 @@ do
             exit
             ;;
         "-L"|"--directory"|"-f"|"--funcall"|"-l"|"--load"|"--eval"|"--execute")
-            EMACS_ARGS+=("$1")
-            EMACS_ARGS+=("$2")
-            shift
-            shift
+            EMACS_ARGS+=("$1" "$2")
+            shift 2
             ;;
         "--pattern=*")
             BUTTERCUP_ARGS+=("--pattern" "${1#--pattern=")
             shift
         "-p"|"--pattern")
-            BUTTERCUP_ARGS+=("$1")
-            BUTTERCUP_ARGS+=("$2")
-            shift
-            shift
+            BUTTERCUP_ARGS+=("$1" "$2")
+            shift 2
             ;;
         "-c"|"--no-color"|"--no-skip"|"--only-error"|"--stale-file-error")
             BUTTERCUP_ARGS+=("$1")
             shift
             ;;
         "--traceback")
-            BUTTERCUP_ARGS+=("$1")
-            BUTTERCUP_ARGS+=("$2")
-            shift
-            shift
+            BUTTERCUP_ARGS+=("$1" "$2")
+            shift 2
             ;;
         *)
             BUTTERCUP_ARGS+=("$1")
