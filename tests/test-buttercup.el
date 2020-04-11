@@ -1649,6 +1649,34 @@ text properties using `ansi-color-apply'."
         (expect (length (cdr specs)) :to-equal 1)
         (expect (cl-caadr specs) :to-equal "should fontify special keywords")))))
 
+(describe "send-string-to-ansi-buffer"
+  (it "tab"
+    (expect (with-temp-buffer
+              (send-string-to-ansi-buffer (current-buffer) "\e[31mfoo\tbar\e[0m")
+              (buffer-string))
+            :to-equal-including-properties
+            (ansi-color-apply "\e[31mfoo     bar\e[0m")))
+  (it "newline"
+    (expect (with-temp-buffer
+              (send-string-to-ansi-buffer (current-buffer) "\e[31mfoo\nbar\e[0m")
+              (buffer-string))
+            :to-equal-including-properties
+            (ansi-color-apply "\e[31mfoo\nbar\e[0m")))
+  (it "backspace"
+    (expect (with-temp-buffer
+              (send-string-to-ansi-buffer (current-buffer) "\e[31mfoo\bbar\e[0m")
+              (buffer-string))
+            :to-equal-including-properties
+            (ansi-color-apply "\e[31mfobar\e[0m")))
+  (it "vertical tab"
+    (expect (with-temp-buffer
+              (send-string-to-ansi-buffer (current-buffer) "\e[31mfoo\vbar\e[0m")
+              (buffer-string))
+            :to-equal-including-properties
+            (ansi-color-apply "\e[31mfoo\n   bar\e[0m")))
+  )
+
+
 ;; Local Variables:
 ;; indent-tabs-mode: nil
 ;; sentence-end-double-space: nil
