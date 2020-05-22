@@ -681,7 +681,8 @@ text properties using `ansi-color-apply'."
   (it "expands directly to a function call"
     (expect (macroexpand '(xit "bla bla" (+ 1 1)))
             :to-equal
-            '(buttercup-xit "bla bla"))))
+            '(buttercup-xit "bla bla"
+               (lambda () (buttercup-with-converted-ert-signals (+ 1 1)))))))
 
 (describe "The `buttercup-xit' function"
   (it "should be a no-op"

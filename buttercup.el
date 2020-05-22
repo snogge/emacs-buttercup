@@ -1012,8 +1012,12 @@ A disabled spec is not run.
 
 DESCRIPTION is a string. BODY is ignored."
   (declare (indent 1))
-  (ignore body)
-  `(buttercup-xit ,description))
+  (if body
+      `(buttercup-xit ,description
+         (lambda ()
+           (buttercup-with-converted-ert-signals
+             ,@body)))
+  `(buttercup-xit ,description ,body)))
 
 (defun buttercup-xit (description &optional function)
   "Like `buttercup-it', but mark the spec as disabled.
