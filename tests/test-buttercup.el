@@ -463,6 +463,15 @@ text properties using `ansi-color-apply'."
         (buttercup--run-suite suite)
         (expect (buttercup-spec-status spec) :to-be 'pending))))
 
+  (it "should note errors in `before-all'"
+    (with-local-buttercup
+     (describe "A suite"
+       (before-all
+         (setf f (1+ f)))
+       (it "contains a spec with an expectation"
+         (expect t)))
+     (expect (buttercup-run t) :not :to-be-truthy)))
+
   (describe "should set status to pending"
     (it "for assume in `before-each'"
       (with-local-buttercup
