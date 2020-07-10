@@ -211,6 +211,7 @@ RESULT is nil, MESSAGE should describe why the matcher failed. If
 RESULT is non-nil, MESSAGE should describe why a negated matcher
 failed."
   (declare (indent defun))
+  (cl-assert (keywordp matcher) "MATCHER should be a keyword (was %S)" matcher)
   `(put ,matcher 'buttercup-matcher
         (lambda ,args
           ,@body)))
