@@ -2047,10 +2047,10 @@ With buttercup minor mode active the following is activated:
 - `describe' and `it' forms are available from `imenu' for
   quicker access."
   :lighter " ❀"
-  (let ((font-lock-form '(("(\\(describe\\|buttercup-define-matcher\\|it\\) "
+  (let ((font-lock-form '(("(\\(x?\\(describe\\|it\\)\\|buttercup-define-matcher\\) "
                            1 'font-lock-keyword-face)))
-        (imenu-forms '(("Test Suites" "\\((describe\\_> +\\)\"\\(\\_<.+\\_>\\)\"" 2)
-                       ("Spec" "\\((it\\_> +\\)\"\\(\\_<.+\\_>\\)\"" 2))))
+        (imenu-forms '(("Test Suites" "\\((x?describe\\_> +\\)\"\\(\\_<.+\\_>\\)\"" 2)
+                       ("Spec" "\\((x?it\\_> +\\)\"\\(\\_<.+\\_>\\)\"" 2))))
     (if buttercup-minor-mode
         (progn
           (font-lock-add-keywords nil font-lock-form)
