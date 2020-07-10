@@ -2005,23 +2005,21 @@ If STYLE is nil, use `buttercup-stack-frame-style' or `crop'."
                             "...")))
        line))
     (`pretty
-     (let ((text (pp-to-string (cdr frame))))
-       ;; Delete empty trailing line
-       (setq text
-             (replace-regexp-in-string
-              "\n[[:space:]]*\\'" ""
-              text))
-       ;; Indent 2 spaces
-       (setq text
-             (replace-regexp-in-string
-              "^" "  "
-              text))
+     (with-temp-buffer
+       (pp (cdr frame) (current-buffer))
        ;; Prefix first line with lambda for function call and M for
        ;; macro/special form
-       (setq text
-             (replace-regexp-in-string
-              "\\` " (if (car frame) "λ" "M")
-              text))))
+       (goto-char (point-min))
+       (insert (if (car frame) "λ" "M") " ")
+       (forward-line)
+       ;; Indent 2 spaces
+       (while (not (eobp))
+         (insert "  ")
+         (forward-line))
+       ;; Delete empty trailing line
+       (skip-syntax-backward " ")
+       (delete-region (point) (point-max))
+       (buffer-string)))
     (_ (error "Unknown stack trace style: %S" style))))
 
 (defmacro buttercup-with-converted-ert-signals (&rest body)
