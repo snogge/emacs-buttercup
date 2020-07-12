@@ -1703,9 +1703,7 @@ EVENT and ARG are described in `buttercup-reporter'."
          (buttercup-reporter-batch--print-spec-done-line arg buttercup-color))
 
        (when (eq (buttercup-spec-status arg) 'failed)
-         (setq buttercup-reporter-batch--failures
-               (append buttercup-reporter-batch--failures
-                       (list arg)))))
+         (push arg buttercup-reporter-batch--failures)))
 
       (`suite-done
        (when (= 0 (length (buttercup-suite-or-spec-parents arg)))
@@ -1716,7 +1714,7 @@ EVENT and ARG are described in `buttercup-reporter'."
        (pop buttercup-reporter-batch--suite-stack))
 
       (`buttercup-done
-       (dolist (failed buttercup-reporter-batch--failures)
+       (dolist (failed (nreverse buttercup-reporter-batch--failures))
          (buttercup-reporter-batch--print-failed-spec-report failed buttercup-color))
        (buttercup-reporter-batch--print-summary arg buttercup-color))
 
