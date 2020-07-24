@@ -1172,6 +1172,20 @@ responsibility to ensure ARG is a command."
     (unless (buttercup--spy-on-and-call-replacement symbol replacement)
       (error "Spies can only be created in `before-each'"))))
 
+(defmacro defspy (function-name &optional args &rest body)
+  "Shortcut for (spy-on FUNCTION-NAME :and-call-fake (lambda (ARGS) BODY)).
+
+\(fn NAME ARGLIST [DOCSTRING] BODY...)"
+  (declare (doc-string 3)
+           (indent 2))
+  (let ((docstring (when (stringp (car body)) (pop body)))
+        (spy-original (symbol-function function-name)))
+    (when spy-original
+      (setq body `((cl-flet ((spy-original ,spy-original)) ,@body))))
+    (when docstring
+      (push docstring body))
+    `(spy-on (quote ,function-name) :and-call-fake
+             (lambda ,args ,@body))))
 
 (defun buttercup--spy-on-and-call-replacement (spy fun)
   "Replace the function in symbol SPY with a spy calling FUN."
