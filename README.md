@@ -20,7 +20,7 @@ The framework is heavily inspired by
 
 A simple test looks like this.
 
-```Lisp
+```Emacs-Lisp
 (describe "A suite"
   (it "contains a spec with an expectation"
     (expect t :to-be t)))
@@ -34,7 +34,7 @@ You can install buttercup from
 [MELPA Stable](http://stable.melpa.org/). Add the following to your
 `init.el` or `.emacs` file:
 
-```
+```Emacs-Lisp
 (require 'package)
 (add-to-list 'package-archives
              '("melpa-stable" . "http://stable.melpa.org/packages/") t)
@@ -47,7 +47,7 @@ simply `apt-get install elpa-buttercup`.
 
 Now create a file called `test-feature.el` with these contents:
 
-```Lisp
+```Emacs-Lisp
 (describe "A suite"
   (it "contains a spec with an expectation"
     (expect t :to-be t)))
