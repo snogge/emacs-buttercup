@@ -1403,15 +1403,20 @@ current directory."
       (buttercup-mark-skipped patterns t))
     (buttercup-run)))
 
+(defun buttercup--unhidden-p (dir)
+  "Return non-nil if DIR is not hidden.
+Dirs are hidden if their name starts with `.'."
+  (not (equal (aref (file-name-nondirectory dir) 0) ?.)))
+
 (defun buttercup-discover-test-files (&optional dirs)
   "Load all test files in DIRS, or `.' if DIRS is nil.
 Test files are files named `test-*.el' or `*-test.el'."
   (dolist (dir (or dirs '(".")))
     (dolist (file (directory-files-recursively
-                   dir "\\`test-.*\\.el\\'\\|-tests?\\.el\\'"))
-      ;; Exclude any hidden directory, both immediate (^.) and nested (/.) subdirs
-      (when (not (string-match "\\(^\\|/\\)\\." (file-relative-name file)))
-        (load file nil t)))))
+                   dir "\\`test-.*\\.el\\'\\|-tests?\\.el\\'"
+                   nil
+                   #'buttercup--unhidden-p))
+      (load file nil t))))
 
 (defun buttercup-mark-skipped (matcher &optional reverse)
   "Mark any spec that match MATCHER as skipped.
