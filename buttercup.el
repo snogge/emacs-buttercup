@@ -1370,22 +1370,22 @@ spec, and should be killed after running the spec.")
 
 Takes directories as command line arguments, defaulting to the
 current directory."
-  (let (dirs patterns (args command-line-args-left) current)
-    (while args
-      (setq current (pop args))
+  (let (dirs patterns current)
+    (while command-line-args-left
+      (setq current (pop command-line-args-left))
       (pcase current
         ("--")
         ("--traceback"
-         (unless args
+         (unless command-line-args-left
            (error "Option requires argument: %s" current))
          ;; Make sure it's a valid style by trying to format a dummy
          ;; frame with it
-         (buttercup--format-stack-frame '(t myfun 1 2) (intern (car args)))
-         (setq buttercup-stack-frame-style (intern (pop args))))
+         (buttercup--format-stack-frame '(t myfun 1 2) (intern (car command-line-args-left)))
+         (setq buttercup-stack-frame-style (intern (pop command-line-args-left))))
         ((or "--pattern" "-p")
-         (unless args
+         (unless command-line-args-left
            (error "Option requires argument: %s" current))
-         (push (pop args) patterns))
+         (push (pop command-line-args-left) patterns))
         ((or "--no-color" "-c")
          (setq buttercup-color nil))
         ("--no-skip"
@@ -1398,7 +1398,6 @@ current directory."
          (buttercup-error-on-stale-elc))
         (_
          (push current dirs))))
-    (setq command-line-args-left nil)
     (dolist (dir (or dirs '(".")))
       (dolist (file (directory-files-recursively
                      dir "\\`test-.*\\.el\\'\\|-tests?\\.el\\'"))
