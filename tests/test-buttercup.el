@@ -1900,10 +1900,10 @@ text properties using `ansi-color-apply'."
         (with-local-buttercup
           (buttercup-run-discover)
           (expect 'directory-files-recursively :to-have-been-called-times 4)
-          (expect 'directory-files-recursively :to-have-been-called-with "foo" "\\`test-.*\\.el\\'\\|-tests?\\.el\\'" nil 'buttercup--unhidden-p)
-          (expect 'directory-files-recursively :to-have-been-called-with "bar" "\\`test-.*\\.el\\'\\|-tests?\\.el\\'" nil 'buttercup--unhidden-p)
-          (expect 'directory-files-recursively :to-have-been-called-with "--strange" "\\`test-.*\\.el\\'\\|-tests?\\.el\\'" nil 'buttercup--unhidden-p)
-          (expect 'directory-files-recursively :to-have-been-called-with "baz" "\\`test-.*\\.el\\'\\|-tests?\\.el\\'" nil 'buttercup--unhidden-p))
+          (expect 'directory-files-recursively :to-have-been-called-with "foo" "\\(\\`test-.*\\|-tests?\\)\\.el\\'" nil 'buttercup--unhidden-p)
+          (expect 'directory-files-recursively :to-have-been-called-with "bar" "\\(\\`test-.*\\|-tests?\\)\\.el\\'" nil 'buttercup--unhidden-p)
+          (expect 'directory-files-recursively :to-have-been-called-with "--strange" "\\(\\`test-.*\\|-tests?\\)\\.el\\'" nil 'buttercup--unhidden-p)
+          (expect 'directory-files-recursively :to-have-been-called-with "baz" "\\(\\`test-.*\\|-tests?\\)\\.el\\'" nil 'buttercup--unhidden-p))
         (expect command-line-args-left :to-equal nil)))
     )
   (describe "find and load files"

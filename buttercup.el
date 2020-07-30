@@ -1413,7 +1413,7 @@ Dirs are hidden if their name starts with `.'."
 Test files are files named `test-*.el' or `*-test.el'."
   (dolist (dir (or dirs '(".")))
     (dolist (file (directory-files-recursively
-                   dir "\\`test-.*\\.el\\'\\|-tests?\\.el\\'"
+                   dir "\\(\\`test-.*\\|-tests?\\)\\.el\\'"
                    nil
                    #'buttercup--unhidden-p))
       (load file nil t))))
