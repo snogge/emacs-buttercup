@@ -1370,43 +1370,34 @@ spec, and should be killed after running the spec.")
 
 Takes directories as command line arguments, defaulting to the
 current directory."
-  (let ((dirs nil)
-        (patterns nil)
-        (args command-line-args-left))
+  (let (dirs patterns (args command-line-args-left) current)
     (while args
-      (cond
-       ((equal (car args) "--")
-        (setq args (cdr args)))
-       ((member (car args) '("--traceback"))
-        (when (not (cdr args))
-          (error "Option requires argument: %s" (car args)))
-        ;; Make sure it's a valid style by trying to format a dummy
-        ;; frame with it
-        (buttercup--format-stack-frame '(t myfun 1 2) (intern (cadr args)))
-        (setq buttercup-stack-frame-style (intern (cadr args)))
-        (setq args (cddr args)))
-       ((member (car args) '("-p" "--pattern"))
-        (when (not (cdr args))
-          (error "Option requires argument: %s" (car args)))
-        (push (cadr args) patterns)
-        (setq args (cddr args)))
-       ((member (car args) '("-c" "--no-color"))
-        (setq buttercup-color nil)
-        (setq args (cdr args)))
-       ((equal (car args) "--no-skip")
-        (push 'skipped buttercup-reporter-batch-quiet-statuses)
-        (push 'disabled buttercup-reporter-batch-quiet-statuses)
-        (setq args (cdr args)))
-       ((equal (car args) "--only-error")
-        (push 'pending buttercup-reporter-batch-quiet-statuses)
-        (push 'passed buttercup-reporter-batch-quiet-statuses)
-        (setq args (cdr args)))
-       ((equal (car args) "--stale-file-error")
-        (buttercup-error-on-stale-elc)
-        (setq args (cdr args)))
-       (t
-        (push (car args) dirs)
-        (setq args (cdr args)))))
+      (setq current (pop args))
+      (pcase current
+        ("--")
+        ("--traceback"
+         (unless args
+           (error "Option requires argument: %s" current))
+         ;; Make sure it's a valid style by trying to format a dummy
+         ;; frame with it
+         (buttercup--format-stack-frame '(t myfun 1 2) (intern (car args)))
+         (setq buttercup-stack-frame-style (intern (pop args))))
+        ((or "--pattern" "-p")
+         (unless args
+           (error "Option requires argument: %s" current))
+         (push (pop args) patterns))
+        ((or "--no-color" "-c")
+         (setq buttercup-color nil))
+        ("--no-skip"
+         (push 'skipped buttercup-reporter-batch-quiet-statuses)
+         (push 'disabled buttercup-reporter-batch-quiet-statuses))
+        ("--only-error"
+         (push 'pending buttercup-reporter-batch-quiet-statuses)
+         (push 'passed buttercup-reporter-batch-quiet-statuses))
+        ("--stale-file-error"
+         (buttercup-error-on-stale-elc))
+        (_
+         (push current dirs))))
     (setq command-line-args-left nil)
     (dolist (dir (or dirs '(".")))
       (dolist (file (directory-files-recursively
