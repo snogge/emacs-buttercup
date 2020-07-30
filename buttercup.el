@@ -1398,15 +1398,20 @@ current directory."
          (buttercup-error-on-stale-elc))
         (_
          (push current dirs))))
-    (dolist (dir (or dirs '(".")))
-      (dolist (file (directory-files-recursively
-                     dir "\\`test-.*\\.el\\'\\|-tests?\\.el\\'"))
-        ;; Exclude any hidden directory, both immediate (^.) and nested (/.) subdirs
-        (when (not (string-match "\\(^\\|/\\)\\." (file-relative-name file)))
-          (load file nil t))))
+    (buttercup-discover-test-files dirs)
     (when patterns
       (buttercup-mark-skipped patterns t))
     (buttercup-run)))
+
+(defun buttercup-discover-test-files (&optional dirs)
+  "Load all test files in DIRS, or `.' if DIRS is nil.
+Test files are files named `test-*.el' or `*-test.el'."
+  (dolist (dir (or dirs '(".")))
+    (dolist (file (directory-files-recursively
+                   dir "\\`test-.*\\.el\\'\\|-tests?\\.el\\'"))
+      ;; Exclude any hidden directory, both immediate (^.) and nested (/.) subdirs
+      (when (not (string-match "\\(^\\|/\\)\\." (file-relative-name file)))
+        (load file nil t)))))
 
 (defun buttercup-mark-skipped (matcher &optional reverse)
   "Mark any spec that match MATCHER as skipped.
