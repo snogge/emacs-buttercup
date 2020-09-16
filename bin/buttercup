@@ -83,7 +83,7 @@ do
             EMACS_ARGS+=("$1")
             shift
             ;;
-        "-L"|"--directory"|"-f"|"--funcall"|"-l"|"--load"|"--eval"|"--execute")
+        -L|--directory|-f|--funcall|-l|--load|--eval|--execute)
             EMACS_ARGS+=("$1" "$2")
             shift 2
             ;;
