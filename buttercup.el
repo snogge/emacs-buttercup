@@ -46,6 +46,7 @@
 (require 'format-spec)
 (require 'ert nil t)
 (require 'warnings)
+(eval-when-compile (require 'rx))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; wrapper function manipulation
@@ -1375,6 +1376,9 @@ current directory."
       (setq current (pop args))
       (pcase current
         ("--")
+        ((rx bos "--traceback=" (let style (+ (not blank))) eos)
+         (buttercup--format-stack-frame '(t myfun 1 2) (intern style))
+         (setq buttercup-stack-frame-style (intern style)))
         ("--traceback"
          (unless args
            (error "Option requires argument: %s" current))
@@ -1382,6 +1386,8 @@ current directory."
          ;; frame with it
          (buttercup--format-stack-frame '(t myfun 1 2) (intern (car args)))
          (setq buttercup-stack-frame-style (intern (pop args))))
+        ((rx bos (or "--pattern=" "-p") (let ptrn (+ (not blank))) eos)
+         (push ptrn patterns))
         ((or "--pattern" "-p")
          (unless args
            (error "Option requires argument: %s" current))

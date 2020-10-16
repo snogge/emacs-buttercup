@@ -1857,13 +1857,15 @@ text properties using `ansi-color-apply'."
         (setq command-line-args-left '("-p"))
         (expect (buttercup-run-discover) :to-throw 'error '("Option requires argument: -p"))))
     (it "collecting `--pattern' and `-p' args and send to `buttercup-mark-skipped'"
-      (let ((command-line-args-left '("--pattern" "foo" "-p" "bar" "--pattern" "baz"))
+      (let ((command-line-args-left '("--pattern" "foo" "-p" "bar" "--pattern" "baz"
+                                      "-pquux" "--pattern=quuux"))
             buttercup-mark-skipped-args)
         (buttercup-run-discover)
         (expect command-line-args-left :to-equal nil)
         (expect 'buttercup-mark-skipped :to-have-been-called-times 1)
         (setq buttercup-mark-skipped-args (car (spy-calls-args-for 'buttercup-mark-skipped 0)))
-        (expect buttercup-mark-skipped-args :to-have-same-items-as '("foo" "bar" "baz"))))
+        (expect buttercup-mark-skipped-args :to-have-same-items-as
+                '("foo" "bar" "baz" "quux" "quuux"))))
     (it "clearing `buttercup-color' if `--no-color' is given"
       (let ((command-line-args-left '("--no-color"))
             (buttercup-color t))
