@@ -81,17 +81,13 @@ do
             EMACS_ARGS="$EMACS_ARGS $1"
             shift
             ;;
-        "-p"|"--pattern")
+        "-p"|"--pattern"|"--traceback")
             BUTTERCUP_ARGS="$BUTTERCUP_ARGS $1 $2"
             shift 2
             ;;
         "-c"|"--no-color"|"--no-skip"|"--only-error"|"--stale-file-error")
             BUTTERCUP_ARGS="$BUTTERCUP_ARGS $1"
             shift
-            ;;
-        "--traceback")
-            BUTTERCUP_ARGS="$BUTTERCUP_ARGS $1 $2"
-            shift 2
             ;;
         *)
             BUTTERCUP_ARGS="$BUTTERCUP_ARGS $1"
