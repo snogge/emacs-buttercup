@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# This is a fake version of emacs used for testing that just prints
+# its arguments
+
+echo "$0" "$@"

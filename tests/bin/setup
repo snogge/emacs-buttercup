@@ -1,0 +1,46 @@
+# Setup for buttercup shell script tests
+# shellcheck shell=sh
+
+die () {
+	echo "$*"
+	exit 1
+}
+
+checkoutput () {
+	local line
+	read -r line
+	if [ ! "$line" = "$*" ]; then
+		cat <<-EOF
+			Expected
+			    $*
+			Received
+			    $line
+			EOF
+		exit 1
+	fi
+}
+
+testdir="${0%/*}"
+if [ "${testdir%%/*}" ]; then
+	# $0 is a relative path
+	## Remove ./ if present, but in two steps in case testdir is "."
+	testdir="${testdir#.}" # Remove leading dot if any
+	testdir="${testdir#/}" # Remove leading slash if any followed .
+	testdir="$PWD/${testdir}" # Prepend PWD with a single separating slash
+	testdir="${testdir%/}" # Remove any trailing slash - if started as "."
+fi
+
+buttercup="${testdir%/*/*}/bin/buttercup"
+if [ ! -f "$buttercup" ]; then
+	die "$buttercup not found"
+fi
+
+shebangshell=$(sed -n -e '/^#!/{' -e s///p -eq -e'}' "$buttercup")
+
+fakemacs="$testdir/fakemacs"
+defaultpath="$(env -S -i sh -c 'echo $PATH')"
+defaultargs="-batch -l buttercup -f buttercup-run-discover --"
+
+# Local Variables:
+# mode: sh
+# End:
