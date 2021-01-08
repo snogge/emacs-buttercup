@@ -6,9 +6,9 @@ die () {
 	exit 1
 }
 
-checkoutput () {
+checkline () {
 	local line
-	read -r line
+	IFS= read -r line
 	if [ ! "$line" = "$*" ]; then
 		cat <<-EOF
 			Expected
@@ -18,6 +18,42 @@ checkoutput () {
 			EOF
 		exit 1
 	fi
+}
+
+checkoutput () {
+	#set -x
+	local input lines flag
+	OPTIND=1
+	while getopts ':n:' flag
+	do
+		case $flag in
+			n)
+				lines="$OPTARG"
+				expr "$lines" : '^[0-9]\+$' >/dev/null ||
+					die "checkoutput: -n expects an integer argument, not '$lines'"
+				;;
+			'?') die "checkoutput: Illegal option -$OPTARG";;
+			:)   die "checkoutput: Option -$OPTARG requires an argument";;
+		esac
+	done
+	shift $((OPTIND - 1))
+	# Avoid $(...) stripping trailing whitespace
+	# by adding an x at the end
+	if [ "$lines" ]; then
+		input=$(head -n"$lines" ; echo x)
+	else
+		input=$(cat ; echo x)
+	fi
+	# Remember to strip the trailing x and the last newline
+	if [ ! "${input%?x}" = "$*" ]; then
+		echo "Expected:"
+		echo "$*" | sed 's/^/    /'
+		echo "Received:"
+		printf "%s" "${input%x}" | sed 's/^/    /'
+		echo "END"
+		exit 1
+	fi
+	set +x
 }
 
 testdir="${0%/*}"

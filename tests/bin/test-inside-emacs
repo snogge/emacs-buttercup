@@ -11,4 +11,4 @@ env -S -i - \
 	INSIDE_EMACS=27.1.0,compile  \
 	PATH="${0%/*}:$defaultpath"  \
 	"$buttercup" select emacs |
-	checkoutput "$testdir/emacs $defaultargs select emacs"
+	checkline "$testdir/emacs $defaultargs select emacs"
