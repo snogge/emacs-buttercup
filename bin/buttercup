@@ -9,7 +9,7 @@ fi
 
 usage () {
     cat <<EOF
-$0 [OPTIONS] [DIRS]
+${0##*/} [OPTIONS] [DIRS]
 
 Buttercup will search recursively in each of DIRS for test files (any
 elisp file starting with "test-" or ending with "-test.el" or

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# shellcheck source=./setup
+## TODO: What happens if $0 have no slashes?  Can that happen?
+. "${0%/*}/setup"
+
+# Test that EMACS_BIN is set to the value of EMACS if INSIDE_EMACS is
+# not set
+
+env -S -i - \
+	EMACS="$fakemacs"            \
+	PATH="${0%/*}:$defaultpath"  \
+	"$buttercup" select emacs |
+	checkline "$fakemacs $defaultargs select emacs"
