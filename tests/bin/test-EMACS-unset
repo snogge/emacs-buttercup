@@ -10,4 +10,4 @@
 env -S -i - \
 	PATH="${0%/*}:$defaultpath"  \
 	"$buttercup" select emacs |
-	checkline "$testdir/emacs $defaultargs select emacs"
+	checkline "$testdir/emacs -batch $defaultargs select emacs"

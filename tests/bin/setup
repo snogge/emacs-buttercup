@@ -75,7 +75,7 @@ shebangshell=$(sed -n -e '/^#!/{' -e s///p -eq -e'}' "$buttercup")
 
 fakemacs="$testdir/fakemacs"
 defaultpath="$(env -S -i sh -c 'echo $PATH')"
-defaultargs="-batch -l buttercup -f buttercup-run-discover --"
+defaultargs="-l buttercup -f buttercup-run-discover --"
 
 # Local Variables:
 # mode: sh

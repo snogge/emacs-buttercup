@@ -11,4 +11,4 @@ env -S -i - \
 	EMACS="$fakemacs"            \
 	PATH="${0%/*}:$defaultpath"  \
 	"$buttercup" select emacs |
-	checkline "$fakemacs $defaultargs select emacs"
+	checkline "$fakemacs -batch $defaultargs select emacs"
