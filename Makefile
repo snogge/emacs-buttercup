@@ -1,8 +1,12 @@
+BASEDIR := $(dir $(lastword $(MAKEFILE_LIST)))
 EMACS := emacs
 VERSION := $(shell sed -ne 's/^;; Version: \(.*\)/\1/p' buttercup.el)
 ELISP_FILES := $(shell ls *.el | grep -v -- '-pkg\.el$$')
 DISTFILES := $(ELISP_FILES) buttercup-pkg.el README.md
 BINTESTS := $(wildcard tests/bin/test-*)
+
+KCOVOUT = $(BASEDIR)koverage
+KCOV = kcov --bash-parse-files-in-dir=$(BASEDIR)bin $(KCOVOUT)
 
 .PHONY: test compile clean
 
@@ -18,8 +22,11 @@ test-docs: compile
 
 test-bin: $(addprefix run-,$(notdir $(BINTESTS)))
 
-run-%:
-	tests/bin/$*
+pre-run-bin:
+	-rm -rf $(KCOVOUT)
+
+run-%: pre-run-bin
+	$(KCOV) tests/bin/$*
 
 compile: $(patsubst %.el,%.elc,$(ELISP_FILES))
 

@@ -10,5 +10,21 @@
 env -S -i - \
 	EMACS="$fakemacs"            \
 	PATH="${0%/*}:$defaultpath"  \
+	BASH_ENV="$BASH_ENV" \
+	BASH_XTRACEFD="$BASH_XTRACEFD" \
+	KCOV_BASH_COMMAND="$KCOV_BASH_COMMAND" \
+	KCOV_BASH_XTRACEFD="$KCOV_BASH_XTRACEFD" \
+	PS4="$PS4" \
 	"$buttercup" --help |
+	checkoutput -n1 "buttercup [OPTIONS] [DIRS]"
+
+env -S -i - \
+	EMACS="$fakemacs"            \
+	PATH="${0%/*}:$defaultpath"  \
+	BASH_ENV="$BASH_ENV" \
+	BASH_XTRACEFD="$BASH_XTRACEFD" \
+	KCOV_BASH_COMMAND="$KCOV_BASH_COMMAND" \
+	KCOV_BASH_XTRACEFD="$KCOV_BASH_XTRACEFD" \
+	PS4="$PS4" \
+	"$buttercup" -h |
 	checkoutput -n1 "buttercup [OPTIONS] [DIRS]"
