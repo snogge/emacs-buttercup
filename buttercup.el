@@ -277,6 +277,8 @@ failed.
   (lambda (&rest args)
     (apply fun (mapcar #'funcall args))))
 
+(define-error 'buttercup-matcher-not-found "`buttercup-matcher' not found" 'buttercup-error-base)
+
 (defun buttercup--find-matcher-function (matcher)
   "Return the matcher function for MATCHER."
   (let ((matcher-prop
@@ -293,7 +295,7 @@ failed.
      ;; code to unpack function-wrapped arguments.
      ((functionp matcher)
       (buttercup--function-as-matcher matcher))
-     (matcher (error "Not a test: `%S'" matcher))
+     (matcher (signal 'buttercup-matcher-not-found (format "Not a test: `%S'" matcher)))
      ;; If `matcher' is nil, then we just want a basic truth test
      ((null matcher)
       (buttercup--find-matcher-function :to-be-truthy))

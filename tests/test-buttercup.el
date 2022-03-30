@@ -355,7 +355,7 @@ before it's processed by other functions."
   (it "should fail if the matcher is not defined"
     (expect (buttercup--apply-matcher
              :not-defined (mapcar #'buttercup--wrap-expr-and-eval '(1 2)))
-            :to-throw)))
+            :to-throw 'buttercup-matcher-not-found "Not a test: `:not-defined'")))
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;;; Built-in matchers
