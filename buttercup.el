@@ -73,6 +73,7 @@ ensures access to the un-expanded form."
     ;; * the stackframe marker
     ;; * the macroexpanded original expression
     (`(closure ,(pred listp) nil
+        ,(pred stringp)
         (quote ,expr) (buttercup--mark-stackframe) ,_expanded)
      expr)
     ;; This a when FUN has not been evaluated. Probably never happens
@@ -85,6 +86,7 @@ ensures access to the un-expanded form."
     ;; In this case expr and expr2 should be equal (but not eq?) as
     ;; expr2 has not been macroexpanded.
     ((and `(lambda nil
+             ,(pred stringp)
              (quote ,expr) (buttercup--mark-stackframe) ,expr2)
           (guard (equal expr expr2)))
      expr)
@@ -131,6 +133,10 @@ a call to `save-match-data', as `format-spec' modifies that."
 (defun buttercup--wrap-expr (expr)
   "Wrap EXPR to be used by `buttercup-expect'."
   `(lambda ()
+     ;; Add the unexpanded EXPR as a string property to an otherwise
+     ;; empty docstring. This will be available even if the tests are
+     ;; byte compiled.
+     ,(propertize "" 'buttercup-expr expr)
      (quote ,expr)
      (buttercup--mark-stackframe)
      ,expr))
