@@ -2085,9 +2085,18 @@ EVENT and ARG are described in `buttercup-reporter'."
                                     (goto-char (point-max))
                                     (insert (apply #'format fmt args))))))
       (unwind-protect
-          (let ((buttercup-color))
-            (buttercup-reporter-batch event arg))
-        (fset 'buttercup--print old-print)))
+          (buttercup-reporter-batch event arg)
+        (fset 'buttercup--print old-print))
+      (goto-char (point-min))
+      (while (re-search-forward "\\(?:.*\r\\)?\e\\[\\(?2:[1-9][0-9]+\\)m\\(?1:.*?\\)\e\\[0m" nil t)
+        (replace-match (propertize (match-string 1) 'face
+                                   `(:foreground
+                                     ,(symbol-name
+                                       (car (rassoc (string-to-number
+                                                     (match-string 2))
+                                                    buttercup-colors)))))
+                       t t))
+      (goto-char (point-max)))
     (let ((w (get-buffer-window (current-buffer))))
       (when w
         (with-selected-window w
