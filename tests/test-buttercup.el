@@ -61,6 +61,7 @@ variables:
          buttercup-color
          buttercup-reporter-batch-quiet-statuses
          buttercup-reporter-batch--suite-stack
+         (buttercup-reporter-batch--print-ongoing t)
          buttercup-reporter-batch--failures
          (buttercup-stack-frame-style 'crop)
          (buttercup-warning-buffer-name " *ignored buttercup warnings*")

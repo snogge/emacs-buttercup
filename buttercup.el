@@ -1687,6 +1687,11 @@ EVENT and ARG are described in `buttercup-reporter'."
 (defvar buttercup-reporter-batch--suite-stack nil
   "Stack of unprinted suites.")
 
+(defvar buttercup-reporter-batch--print-ongoing
+  (not (getenv "GITHUB_ACTION"))
+  "If non-nil, print the spec description in neutral color before running the spec.
+Then remove it with `\r' before printing it in the appropriate color.")
+
 (defun buttercup-reporter-batch--quiet-spec-p (spec)
   "Return non-nil if the status of SPEC is any of the quiet statuses.
 SPEC is considered quiet if its status is listed in
@@ -1734,6 +1739,7 @@ EVENT and ARG are described in `buttercup-reporter'."
          (buttercup--print "%s\n" (buttercup--indented-description arg))))
       (`spec-started
        (or buttercup-reporter-batch-quiet-statuses
+           (not buttercup-reporter-batch--print-ongoing)
            (and buttercup-color
                 (string-match-p "[\n\v\f]" (buttercup-spec-description arg)))
            (buttercup--print "%s" (buttercup--indented-description arg))))
@@ -1807,7 +1813,9 @@ Finally print the elapsed time for SPEC."
       ;; Carriage returns (\r) should not be colorized. It would mess
       ;; up color handling in Emacs compilation buffers using
       ;; `ansi-color-apply-on-region' in `compilation-filter-hook'.
-      (buttercup--print "\r%s"
+      (buttercup--print "%s%s"
+                        (if buttercup-reporter-batch--print-ongoing
+                            "\r" "")
                         (buttercup-colorize
                          (buttercup--indented-description spec) color)))
     (unless (eq 'passed status)
