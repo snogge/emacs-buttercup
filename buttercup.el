@@ -1739,7 +1739,7 @@ EVENT and ARG are described in `buttercup-reporter'."
          (buttercup--print "%s\n" (buttercup--indented-description arg))))
       (`spec-started
        (or buttercup-reporter-batch-quiet-statuses
-           (not buttercup-reporter-batch--print-ongoing)
+           ;;           (not buttercup-reporter-batch--print-ongoing)
            (and buttercup-color
                 (string-match-p "[\n\v\f]" (buttercup-spec-description arg)))
            (buttercup--print "%s" (buttercup--indented-description arg))))
@@ -1814,8 +1814,7 @@ Finally print the elapsed time for SPEC."
       ;; up color handling in Emacs compilation buffers using
       ;; `ansi-color-apply-on-region' in `compilation-filter-hook'.
       (buttercup--print "%s%s"
-                        (if buttercup-reporter-batch--print-ongoing
-                            "\r" "")
+                        (make-string (length (buttercup--indented-description spec)) ?\b)
                         (buttercup-colorize
                          (buttercup--indented-description spec) color)))
     (unless (eq 'passed status)
