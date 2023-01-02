@@ -1966,6 +1966,7 @@ failed -- The second value is the description of the expectation
   (catch 'buttercup-debugger-continue
     (let ((debugger #'buttercup--debugger)
           (debug-on-error t)
+          (debug-on-signal t)
           (debug-ignored-errors nil))
       (list 'passed
             (apply function arguments)
@@ -1978,11 +1979,13 @@ ARGS according to `debugger'."
   ;; If we do not do this, Emacs will not run this handler on
   ;; subsequent calls. Thanks to ert for this.
   (setq num-nonmacro-input-events (1+ num-nonmacro-input-events))
-  (throw 'buttercup-debugger-continue
-         (list 'failed args
-               (cl-destructuring-bind (_ (signal-type . data)) args
-                 (unless (eq signal-type 'buttercup-pending)
-                   (buttercup--backtrace))))))
+  (cl-destructuring-bind (_ (signal-type . data)) args
+    (pcase signal-type
+      ((or 'buttercup-failed 'buttercup-pending)
+       (throw 'buttercup-debugger-continue
+              (list 'failed args (when (eq signal-type 'buttercup-failed)
+                                   (buttercup--backtrace)))))
+      (_ (signal signal-type data)))))
 
 (defalias 'buttercup--mark-stackframe 'ignore
   "Marker to find where the backtrace start.")
