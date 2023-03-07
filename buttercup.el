@@ -1983,6 +1983,21 @@ Finally print the elapsed time for SPEC."
                         (buttercup-colorize (concat "  " failure) color)))
     (buttercup--print " (%s)\n" (buttercup-elapsed-time-string spec))))
 
+(defun buttercup--fill-failure (failure start-col indent)
+  "Use fill functions to linebreak FAILURE text.
+The first line must fit between column START-COL and `fill-column'.
+The rest of the lines shall be indented INDENT spaces."
+  (with-temp-buffer
+    (insert failure)
+    (goto-char 1)
+    (insert (make-string start-col ?\s))
+    (let ((fill-prefix (make-string indent ?\s)))
+      (fill-region 1 (point-max)))
+    ;; (goto-char 1)
+    ;;(skip-syntax-forward "-")
+    (delete-region 1 start-col)
+    (buffer-string)))
+
 (cl-defun buttercup-reporter-batch--print-failed-spec-report (failed-spec color)
   "Print a failure report for FAILED-SPEC.
 
@@ -2007,13 +2022,13 @@ Colorize parts of the output if COLOR is non-nil."
                         (if color
                             (buttercup-colorize "FAILED" 'red)
                           "FAILED")
-                        description))
+                        (buttercup--fill-failure description 8 2)))
      ((and (consp description) (eq (car description) 'error))
       (buttercup--print "%S: %S\n"
                         (car description)
                         (cadr description)))
      (t
-      (buttercup--print "FAILED: %S\n" description)))
+      (buttercup--print "FAILED:\n%S\n" (buttercup--fill-failure description 2 2))))
     (buttercup--print "\n")))
 
 (defun buttercup-reporter-batch--print-summary (suites color)
