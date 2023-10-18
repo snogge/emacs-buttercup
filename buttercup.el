@@ -652,6 +652,8 @@ nil."
                                 (cons expected-signal-symbol expected-signal-args)
                                 unevaluated-expr expr-value)))
 
+(buttercup-define-matcher-alias :to-signal :to-throw)
+
 (defun buttercup--handle-to-throw (thrown-signal expected-signal unevaluated-expr expr-value)
   "Handle the results of the :to-throw matcher.
 This is a separate function for testability purposes.
