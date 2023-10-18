@@ -262,6 +262,11 @@ BODY may start with a docstring."
         (lambda ,args
           ,@body)))
 
+(defmacro buttercup-define-matcher-alias (matcher definition)
+  "Define MATCHER as an alternative name for DEFINITION.
+There is no protection against circular alias chains."
+  `(put ,matcher 'buttercup-matcher ,definition))
+
 (defun buttercup--function-as-matcher (fun)
   "Wrap FUN in code to unpack function-wrapped arguments."
   (cl-assert (functionp fun) t)
@@ -277,6 +282,8 @@ BODY may start with a docstring."
      ;; Use `buttercup-matcher' property if it's a function
      ((functionp matcher-prop)
       matcher-prop)
+     ((and matcher-prop (symbolp matcher-prop))
+      (buttercup--find-matcher-function matcher-prop))
      (matcher-prop
       (error "%S %S has a `buttercup-matcher' property that is not a function. Buttercup has been misconfigured"
              (if (keywordp matcher) "Keyword" "Symbol") matcher))
