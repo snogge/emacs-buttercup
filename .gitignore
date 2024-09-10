@@ -4,3 +4,8 @@
 # ELPA-generated files
 /buttercup-autoloads.el
 /buttercup-pkg.el
+*.info
+*.aux
+*.dvi
+/buttercup.log
+/buttercup.toc

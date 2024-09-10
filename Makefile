@@ -19,5 +19,9 @@ compile: $(patsubst %.el,%.elc,$(ELISP_FILES))
 %.elc: %.el
 	$(EMACS) -batch -L . -f batch-byte-compile $<
 
+doc: info
+info: docs/buttercup.info
+
 clean:
 	rm -f *.elc tests/*.elc
+	rm -f docs/*.info
