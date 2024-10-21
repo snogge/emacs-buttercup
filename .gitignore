@@ -7,5 +7,6 @@
 *.info
 *.aux
 *.dvi
+*.eps
 /buttercup.log
 /buttercup.toc

@@ -19,9 +19,18 @@ compile: $(patsubst %.el,%.elc,$(ELISP_FILES))
 %.elc: %.el
 	$(EMACS) -batch -L . -f batch-byte-compile $<
 
+%.eps: %.jpg
+	convert $< eps2:$@
+
 doc: info
 info: docs/buttercup.info
+doc: dvi
+dvi: docs/buttercup.dvi
+docs/buttercup.dvi: docs/images/buttercup.eps
+
+TEXI2DVI_FLAGS = -o $@
 
 clean:
 	rm -f *.elc tests/*.elc
 	rm -f docs/*.info
+	rm -f docs/*.dvi docs/images/*.eps
