@@ -9,5 +9,6 @@
 *.dvi
 *.eps
 *.ps
+*.pdf
 /buttercup.log
 /buttercup.toc
