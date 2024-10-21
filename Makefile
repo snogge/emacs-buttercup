@@ -26,11 +26,18 @@ doc: info
 info: docs/buttercup.info
 doc: dvi
 dvi: docs/buttercup.dvi
+doc: ps
+ps: docs/buttercup.ps
 docs/buttercup.dvi: docs/images/buttercup.eps
 
 TEXI2DVI_FLAGS = -o $@
+
+DVIPS=dvips
+%.ps: %.dvi
+	TEXPICTS=docs $(DVIPS) -o $@ $<
 
 clean:
 	rm -f *.elc tests/*.elc
 	rm -f docs/*.info
 	rm -f docs/*.dvi docs/images/*.eps
+	rm -f docs/*.ps

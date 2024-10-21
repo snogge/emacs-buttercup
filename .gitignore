@@ -8,5 +8,6 @@
 *.aux
 *.dvi
 *.eps
+*.ps
 /buttercup.log
 /buttercup.toc
