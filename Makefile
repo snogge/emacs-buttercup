@@ -28,6 +28,8 @@ doc: dvi
 dvi: docs/buttercup.dvi
 doc: pdf
 pdf: docs/buttercup.pdf
+doc: html
+html: docs/buttercup.html
 doc: ps
 ps: docs/buttercup.ps
 docs/buttercup.dvi: docs/images/buttercup.eps
@@ -37,6 +39,12 @@ TEXI2DVI_FLAGS = -o $@
 TEXI2PDF ?= texi2pdf
 docs/buttercup.pdf: docs/buttercup.texi
 	$(TEXI2PDF) -o $@ $<
+
+MAKEINFOHTML ?= makeinfo --html
+%.html: %.texi
+	$(MAKEINFOHTML) $(MAKEINFOFLAGS) -I ${@D} -I ${<D} -o $@ $<
+	mkdir -p $@/images
+	cp docs/images/buttercup.jpg $@/images
 
 DVIPS=dvips
 %.ps: %.dvi
@@ -48,3 +56,4 @@ clean:
 	rm -f docs/*.dvi docs/images/*.eps
 	rm -f docs/*.pdf
 	rm -f docs/*.ps
+	rm -rf docs/*.html
